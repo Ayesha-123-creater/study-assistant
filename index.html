@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Study Assistant</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,sans-serif;
+  background:#f1f5f9;
+}
+.app{
+  max-width:580px;
+  margin:30px auto;
+  background:#ffffff;
+  border-radius:18px;
+  box-shadow:0 25px 50px rgba(15,23,42,.15);
+  padding:22px;
+}
+h1{text-align:center;color:#0f172a}
+.sub{text-align:center;color:#475569;font-size:14px;margin-bottom:14px}
+
+.tabs,.subtabs{
+  display:flex;
+  gap:6px;
+  margin:10px 0;
+}
+.tabs button,.subtabs button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#e2e8f0;
+  cursor:pointer;
+  font-size:13px;
+}
+.tabs button.active,.subtabs button.active{
+  background:#2563eb;
+  color:#fff;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:8px;
+  border:1px solid #cbd5f5;
+}
+
+button.main{
+  width:100%;
+  padding:12px;
+  background:#2563eb;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  font-size:15px;
+  cursor:pointer;
+}
+button.main:hover{background:#1e40af}
+
+#output{
+  margin-top:15px;
+  background:#f8fafc;
+  padding:15px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.6;
+  white-space:pre-wrap;
+  min-height:140px;
+}
+
+footer{text-align:center;font-size:12px;color:#64748b;margin-top:10px}
+</style>
+</head>
+
+<body>
+<div class="app">
+<h1>Smart Study Assistant</h1>
+<div class="sub">Personalized learning tool for students</div>
+
+<div class="tabs">
+  <button class="active" onclick="setMain('learn',this)">📘 Learn</button>
+  <button onclick="setMain('practice',this)">📝 Practice</button>
+  <button onclick="setMain('revision',this)">🔁 Revision</button>
+  <button onclick="setMain('doubt',this)">💬 Doubt</button>
+</div>
+
+<div class="subtabs" id="subtabs"></div>
+
+<input id="topic" placeholder="Enter topic (e.g. DBMS Normalization)">
+<input id="time" placeholder="Time available (optional)">
+
+<button class="main" onclick="runEngine()">Generate</button>
+
+<div id="output"></div>
+<footer>AI-Powered Study Prototype</footer>
+</div>
+
+<script>
+let MAIN="learn", SUB="Study Plan";
+
+const subtabs={
+  learn:["Study Plan"],
+  practice:["MCQs","Written","Mixed"],
+  revision:["Quick Notes","Exam Points"],
+  doubt:["Explain Simply"]
+};
+
+function setMain(m,btn){
+  MAIN=m; SUB=subtabs[m][0];
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  buildSubTabs();
+  document.getElementById("output").innerHTML="";
+}
+
+function buildSubTabs(){
+  const box=document.getElementById("subtabs");
+  box.innerHTML="";
+  subtabs[MAIN].forEach((s,i)=>{
+    const b=document.createElement("button");
+    b.innerText=s;
+    if(i===0)b.classList.add("active");
+    b.onclick=()=>{
+      SUB=s;
+      document.querySelectorAll(".subtabs button").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+    };
+    box.appendChild(b);
+  });
+}
+buildSubTabs();
+
+function runEngine(){
+  const topic=document.getElementById("topic").value.trim();
+  const time=document.getElementById("time").value.trim();
+  const out=document.getElementById("output");
+
+  if(!topic){alert("Please enter a topic");return;}
+
+  out.innerHTML="⚙ Generating smart content...";
+
+  setTimeout(()=>{
+    let text="";
+
+    if(MAIN==="learn"){
+      text=`📅 STUDY PLAN: ${topic}\n\n`+
+      `Day 1: Understand basic concepts\n`+
+      `Day 2: Learn examples & diagrams\n`+
+      `Day 3: Apply concepts with practice\n`+
+      `Final Day: Revise & self-test\n\n`+
+      `Suggested Time: ${time || "Flexible"}`;
+    }
+
+    if(MAIN==="practice"){
+      if(SUB==="MCQs")
+        text=`📝 MCQs – ${topic}\n\n1. What is ${topic}?\n2. Identify the correct statement\n3. Choose the best example\n4. Conceptual MCQ`;
+      if(SUB==="Written")
+        text=`✍ Written Practice – ${topic}\n\n• Short answer question\n• Explain with diagram\n• Long answer question`;
+      if(SUB==="Mixed")
+        text=`📚 Mixed Practice – ${topic}\n\n• 2 MCQs\n• 1 Short answer\n• 1 Long answer`;
+    }
+
+    if(MAIN==="revision"){
+      if(SUB==="Quick Notes")
+        text=`🔁 QUICK NOTES – ${topic}\n\n• Definition\n• Key terms\n• Simple explanation`;
+      if(SUB==="Exam Points")
+        text=`🎯 EXAM POINTS – ${topic}\n\n• Frequently asked\n• Important keywords\n• Scoring areas`;
+    }
+
+    if(MAIN==="doubt"){
+      text=`💡 SIMPLE EXPLANATION\n\n${topic} explained using real-life analogy and easy language for students.`;
+    }
+
+    out.innerHTML=text;
+  },700);
+}
+</script>
+</body>
+</html>
